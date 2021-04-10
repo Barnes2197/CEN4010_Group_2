@@ -1,18 +1,21 @@
 import React, { Component } from "react";
 import "bootstrap/dist/css/bootstrap.min.css"
 import axios from 'axios'
-import { Redirect } from "react-router";
  
-class Users extends Component {
+class Profile extends Component {
   constructor(){
     super()
+    let user = JSON.parse(localStorage.getItem('user'))
     this.state = {
-        fullName:'',
-        username:'',
-        email:'',
-        password:'',
-        address:'',
-        nickname:'',
+        fullName: user.fullName,
+        username: user.username,
+        email: user.email,
+        password: user.password,
+        address: user.address,
+        nickname: user.nickname,
+        creditcard: user.creditcard,
+        shippingaddress: user.shippingaddress,
+        _id: user._id
     }
     this.changeFullName = this.changeFullName.bind(this)
     this.changeUsername = this.changeUsername.bind(this)
@@ -20,6 +23,8 @@ class Users extends Component {
     this.changePassword = this.changePassword.bind(this)
     this.changeAddress = this.changeAddress.bind(this)
     this.changeNick = this.changeNick.bind(this)
+    this.changeCreditCard = this.changeCreditCard.bind(this)
+    this.changeShipping = this.changeShipping.bind(this)
     this.onSubmit = this.onSubmit.bind(this)
 
   }
@@ -54,63 +59,37 @@ class Users extends Component {
         nickname:event.target.value
     })
   }
-
-  validation() {
-    let formIsValid = true
-    if (this.state.password === '') {
-      alert("Password cannot be empty")
-      formIsValid = false
-      return formIsValid
-    }
-    
-    if (this.state.email == '') {
-      alert("Email cannot be empty")
-      formIsValid = false
-      return formIsValid
-    }
-
-    if (this.state.username == '') {
-      alert("Username cannot be empty")
-      formIsValid = false
-      return formIsValid
-    }
-    return formIsValid 
+  changeCreditCard(event){
+    this.setState({
+        creditcard:event.target.value
+    })
+  }
+  changeShipping(event){
+    this.setState({
+        shippingaddress:event.target.value
+    })
   }
 
   onSubmit(event){
     event.preventDefault()
 
-    if (this.validation()) {
-      alert("User Registered")
-
-
-
-      const registered = {
+    const updated = {
         fullName: this.state.fullName,
         username: this.state.username,
         email: this.state.email,
-        password: this.state.password,
         address: this.state.address,
         nickname: this.state.nickname,
-      }
-
-    
-      //sending registered data
-      axios.post('http://localhost:5000/signup', registered)
-        .then(response => console.log(response.data))
-
-      this.setState({
-        fullName:'',
-        username:'',
-        email:'',
-        password:'',
-        address:'',
-        nickname:'',
-      })
+        creditcard: this.state.creditcard,
+        shippingaddress: this.state.shippingaddress,
     }
-    
-}
 
+    //sending updated data
+    axios.put('http://localhost:5000/update', updated)
+        .then(loginuser => {
+            console.log(loginuser['data']['updateUser'])
+            localStorage.setItem('user', JSON.stringify(loginuser['data']['updateUser']))
+          })
+}
 
 
 render() {
@@ -119,7 +98,7 @@ render() {
           <div className='container'>
               <div className='form-div'>
                   <form onSubmit={this.onSubmit}>
-                      <h> Login Credentials </h>
+                      <h> Username </h>
                       <input type = 'text'
                       placeholder='Username'
                       onChange={this.changeUsername}
@@ -127,14 +106,7 @@ render() {
                       className='form-control form-group'
                       />
 
-                      <input type = 'password'
-                      placeholder='Password'
-                      onChange={this.changePassword}
-                      value={this.state.password}
-                      className='form-control form-group'
-                      />
-
-                      <h> Personal Information</h>
+                      <h> Full Name </h>
                       <input type = 'text'
                       placeholder='Full Name'
                       onChange={this.changeFullName}
@@ -142,13 +114,7 @@ render() {
                       className='form-control form-group'
                       />                            
 
-                      <input type = 'text'
-                      placeholder='Email'
-                      onChange={this.changeEmail}
-                      value={this.state.email}
-                      className='form-control form-group'
-                      />
-
+                      <h> Home Address </h>
                       <input type = 'text'
                       placeholder='Address'
                       onChange={this.changeAddress}
@@ -156,6 +122,7 @@ render() {
                       className='form-control form-group'
                       />
 
+                      <h> Nickname </h>
                       <input type = 'text'
                       placeholder='Nickname'
                       onChange={this.changeNick}
@@ -163,9 +130,24 @@ render() {
                       className='form-control form-group'
                       />
 
+                      <h> Shipping Address </h>
+                      <input type = 'text'
+                      placeholder='Shipping Address'
+                      onChange={this.changeShipping}
+                      value={this.state.shippingaddress}
+                      className='form-control form-group'
+                      />
+
+                      <h> Credit Card </h>
+                      <input type = 'text'
+                      placeholder='Credit Card'
+                      onChange={this.changeCreditCard}
+                      value={this.state.creditcard}
+                      className='form-control form-group'
+                      />
 
 
-                      <input type='submit' className='btn btn-danger btn-block' value='Submit'/>
+                      <input type='submit' className='btn btn-danger btn-block' value='Save Changes'/>
                   </form>
               </div>
           </div>
@@ -174,4 +156,4 @@ render() {
   }
 }
  
-export default Users;
+export default Profile;
